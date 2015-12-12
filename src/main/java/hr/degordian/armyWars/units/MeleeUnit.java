@@ -4,6 +4,9 @@ public abstract class MeleeUnit implements Unit {
 
 	public static final float STRONGER_COEF = 1.4f;
 	
+	public static final int MAX_STRENGTH = 100;
+	public static final int MIN_STRENGTH = 1;
+	
 	private int strength;
 	
 	public MeleeUnit(int strength) {

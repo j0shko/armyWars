@@ -1,6 +1,6 @@
 package hr.degordian.armyWars;
 
-import hr.degordian.armyWars.units.MeleeUnit;
+import hr.degordian.armyWars.units.Cavalryman;
 import hr.degordian.armyWars.units.Unit;
 
 import java.util.ArrayList;
@@ -8,15 +8,15 @@ import java.util.List;
 
 public class Army {
 
-	private MeleeUnit general;
+	private Cavalryman general;
 	
 	private List<Unit> allUnits = new ArrayList<>();
 	
-	public Army(MeleeUnit general) {
+	public Army(Cavalryman general) {
 		this.general = general;
 	}
 	
-	public MeleeUnit getGeneral() {
+	public Cavalryman getGeneral() {
 		return general;
 	}
 	

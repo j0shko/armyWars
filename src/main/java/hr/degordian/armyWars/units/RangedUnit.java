@@ -3,6 +3,7 @@ package hr.degordian.armyWars.units;
 public abstract class RangedUnit implements Unit {
 
 	public static final int MAX_ACCURACY = 100;
+	public static final int MIN_ACCURACY = 1;
 	
 	private int accuracy;
 	
