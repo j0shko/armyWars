@@ -1,23 +1,43 @@
 package hr.degordian.armyWars;
 
-import units.Unit;
+import hr.degordian.armyWars.units.MeleeUnit;
+import hr.degordian.armyWars.units.Unit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Army {
 
-	private int unitCount;
+	private MeleeUnit general;
 	
+	private List<Unit> allUnits = new ArrayList<>();
 	
-	private Unit general;
-	
-	public Army(Unit general) {
+	public Army(MeleeUnit general) {
 		this.general = general;
 	}
 	
-	public Unit getGeneral() {
+	public MeleeUnit getGeneral() {
 		return general;
 	}
 	
 	public int getUnitCount() {
-		return unitCount;
+		return allUnits.size();
+	}
+	
+	public void addUnit(Unit unit) {
+		allUnits.add(unit);
+	}
+	
+	public List<Unit> getAllUnits() {
+		return allUnits;
+	}
+	
+	@Override
+	public String toString() {
+		String returnString = "General: " + general + "\n";
+		for (Unit unit : allUnits) {
+			returnString += unit + "\n";
+		}
+		return returnString;
 	}
 }

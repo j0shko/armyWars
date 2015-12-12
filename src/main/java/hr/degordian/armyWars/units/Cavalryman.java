@@ -1,19 +1,18 @@
-package units;
+package hr.degordian.armyWars.units;
 
-public class Cavalryman extends Unit {
+public class Cavalryman extends MeleeUnit {
 
 	public Cavalryman(int strength) {
 		super(strength);
 	}
 	
 	@Override
-	public boolean isWeakAgainst(Unit otherUnit) {
-		return otherUnit instanceof Spearman;
-	}
-
-	@Override
 	public boolean isStrongAgainst(Unit otherUnit) {
 		return otherUnit instanceof Swordsman;
 	}
 
+	@Override
+	public String toString() {
+		return "Cavalryman ("+ getStrength() + ")";
+	}
 }
