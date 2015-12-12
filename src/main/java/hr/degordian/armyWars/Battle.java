@@ -1,5 +1,8 @@
 package hr.degordian.armyWars;
 
+import hr.degordian.armyWars.terrain.NormalTerrain;
+import hr.degordian.armyWars.terrain.Terrain;
+import hr.degordian.armyWars.units.Archer;
 import hr.degordian.armyWars.units.MeleeUnit;
 import hr.degordian.armyWars.units.RangedUnit;
 import hr.degordian.armyWars.units.Unit;
@@ -17,30 +20,41 @@ public class Battle {
 	private Army army1;
 	private Army army2;
 	
+	private Terrain terrain = new NormalTerrain();
+	
 	public Battle(Army army1, Army army2) {
 		this.army1 = army1;
 		this.army2 = army2;
 	}
 	
+	public void setTerrain(Terrain terrain) {
+		this.terrain = terrain;
+	}
+	
 	public Army fight() {
+		System.out.println("Terrain: " + terrain);
 		
 		// ranged fight
+		System.out.println("Archers shoot. \n--------------------------------");
 		List<RangedUnit> ranged1 = getAllRangedUnits(army1.getAllUnits());
 		List<RangedUnit> ranged2 = getAllRangedUnits(army2.getAllUnits());
 		
 		List<Unit> units1 = new ArrayList<>(army1.getAllUnits());
 		List<Unit> units2 = new ArrayList<>(army2.getAllUnits());
 
-		rangedUnitsShoot(ranged1, units2);
-		rangedUnitsShoot(ranged2, units1);
+		rangedUnitsShoot(ranged1, units2, 1);
+		rangedUnitsShoot(ranged2, units1, 2);
 		
 		// melee fight
+		System.out.println("\nMelee units fight. \n--------------------------------");
 		List<MeleeUnit> meleeUnits1 = getAllMeleeUnits(units1);
 		List<MeleeUnit> meleeUnits2 = getAllMeleeUnits(units2);
 		
 		meleeUnitsFight(meleeUnits1, meleeUnits2);
 		
-		return meleeUnits1.isEmpty() ? army2 : army1;
+		winner = meleeUnits1.isEmpty() ? army2 : army1;
+		loser = winner == army1 ? army2 : army1;
+		return winner;
 	}
 	
 	public Army getWinner() {
@@ -55,13 +69,18 @@ public class Battle {
 		return army1.getGeneral().getStrength() / army2.getGeneral().getStrength();
 	}
 	
-	private void rangedUnitsShoot(List<RangedUnit> rangedUnits, List<Unit> targets) {
+	private void rangedUnitsShoot(List<RangedUnit> rangedUnits, List<Unit> targets, int army) {
 		Random ran = new Random();
 		for (RangedUnit rangedUnit : rangedUnits) {
-			int target = ran.nextInt(targets.size());
-			if (ran.nextInt(RangedUnit.MAX_ACCURACY) < rangedUnit.getAccuracy() * getGeneralCoeficient()) {
-				targets.remove(target);
+			float terrainModificator = terrain.getModificationForUnit(rangedUnit);
+			if (rangedUnit instanceof Archer) {
 				
+			}
+			int target = ran.nextInt(targets.size());
+			Unit targetUnit = targets.get(target);
+			if (ran.nextInt(RangedUnit.MAX_ACCURACY) < rangedUnit.getAccuracy() * getGeneralCoeficient() * terrainModificator) {
+				targets.remove(target);
+				printDeath(rangedUnit, targetUnit, army);
 			}
 		}
 	}
@@ -102,19 +121,25 @@ public class Battle {
 					strCoef = 1;
 				}
 				
-				int str1 = (int) (unit1.getStrength()*strCoef*getGeneralCoeficient());
-				int str2 = unit2.getStrength();
+				float terrainModificator1 = terrain.getModificationForUnit(unit1);
+				float terrainModificator2 = terrain.getModificationForUnit(unit2);
+				int str1 = (int) (unit1.getStrength()*strCoef*getGeneralCoeficient() * terrainModificator1);
+				int str2 = (int) (unit2.getStrength() * terrainModificator2);
 				
 				if (str1 > str2) {
 					unitsToRemove2.add(unit2);
+					printDeath(unit1, unit2, 1);
 				} else if (str1 < str2) {
 					unitsToRemove1.add(unit1);
+					printDeath(unit2, unit1, 2);
 				} else {
 					Random ran = new Random();
 					if (ran.nextInt(100) < 50) {
 						unitsToRemove2.add(unit2);
+						printDeath(unit1, unit2, 1);
 					} else {
 						unitsToRemove1.add(unit1);
+						printDeath(unit2, unit1, 2);
 					}
 				}
 			}
@@ -132,5 +157,9 @@ public class Battle {
 			}
 		}
 		return meleeUnits;
+	}
+	
+	private static void printDeath (Unit killer, Unit target, int army) {
+		System.out.println(killer + " from army "+ army + " has killed " + target +" from army "+ (army == 1? "2" : "1"));
 	}
 }
