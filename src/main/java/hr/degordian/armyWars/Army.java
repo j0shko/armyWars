@@ -34,10 +34,22 @@ public class Army {
 	
 	@Override
 	public String toString() {
-		String returnString = "General: " + general + "\n";
+		StringBuffer returnString = new StringBuffer();
+		returnString.append("General:").append(general).append('\n');
+		final int numForRow = 5;
+		int currentNum = 0;
 		for (Unit unit : allUnits) {
-			returnString += unit + "\n";
+			returnString.append(unit);
+			if (currentNum < numForRow) {
+				currentNum++;
+				returnString.append(", ");
+			} else {
+				currentNum = 0;
+				returnString.append('\n');
+			}
 		}
-		return returnString;
+		returnString.delete(returnString.length()-2, returnString.length());
+		
+		return returnString.toString();
 	}
 }

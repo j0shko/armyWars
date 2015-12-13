@@ -2,7 +2,6 @@ package hr.degordian.armyWars;
 
 import hr.degordian.armyWars.terrain.NormalTerrain;
 import hr.degordian.armyWars.terrain.Terrain;
-import hr.degordian.armyWars.units.Archer;
 import hr.degordian.armyWars.units.MeleeUnit;
 import hr.degordian.armyWars.units.RangedUnit;
 import hr.degordian.armyWars.units.Unit;
@@ -35,7 +34,7 @@ public class Battle {
 		System.out.println("Terrain: " + terrain);
 		
 		// ranged fight
-		System.out.println("Archers shoot. \n--------------------------------");
+		System.out.println("\nArchers shoot. \n--------------------------------");
 		List<RangedUnit> ranged1 = getAllRangedUnits(army1.getAllUnits());
 		List<RangedUnit> ranged2 = getAllRangedUnits(army2.getAllUnits());
 		
@@ -73,9 +72,6 @@ public class Battle {
 		Random ran = new Random();
 		for (RangedUnit rangedUnit : rangedUnits) {
 			float terrainModificator = terrain.getModificationForUnit(rangedUnit);
-			if (rangedUnit instanceof Archer) {
-				
-			}
 			int target = ran.nextInt(targets.size());
 			Unit targetUnit = targets.get(target);
 			if (ran.nextInt(RangedUnit.MAX_ACCURACY) < rangedUnit.getAccuracy() * getGeneralCoeficient() * terrainModificator) {

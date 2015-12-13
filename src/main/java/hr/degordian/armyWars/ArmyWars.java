@@ -1,15 +1,23 @@
 package hr.degordian.armyWars;
 
 import hr.degordian.armyWars.terrain.MountainTerrain;
+import hr.degordian.armyWars.terrain.NormalTerrain;
+import hr.degordian.armyWars.terrain.PlainsTerrain;
+import hr.degordian.armyWars.terrain.Terrain;
+import hr.degordian.armyWars.terrain.WoodTerrain;
 import hr.degordian.armyWars.units.Archer;
 import hr.degordian.armyWars.units.Cavalryman;
 import hr.degordian.armyWars.units.MeleeUnit;
+import hr.degordian.armyWars.units.RangedUnit;
 import hr.degordian.armyWars.units.Spearman;
 import hr.degordian.armyWars.units.Swordsman;
+import hr.degordian.armyWars.units.Unit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ArmyWars {
@@ -33,11 +41,15 @@ public class ArmyWars {
 		System.out.println("Army 2:");
 		System.out.println(army2);
 		
+		System.out.println("\n================================");
+		Terrain terrain = chooseTerrain(br);
+		
+		System.out.println("\n================================");
 		System.out.println("Let the battle begin!");
 		br.readLine();
 		
 		Battle battle = new Battle(army1, army2);
-		battle.setTerrain(new MountainTerrain());
+		battle.setTerrain(terrain);
 		String winner = battle.fight() == army1 ? "Army 1" : "Army 2";
 		
 		System.out.println();
@@ -61,8 +73,6 @@ public class ArmyWars {
 		return ran.nextInt(max-min+1) + min;
 	}
 	
-	//------------------ army generation ---------------------
-	
 	private static int getInput(String inputName, int min, int max, BufferedReader br) throws IOException {
 		boolean validInput;
 		int input = min;
@@ -71,7 +81,7 @@ public class ArmyWars {
 			String inputString = br.readLine();
 			validInput = checkIfValid(inputString, min, max);
 			if (!validInput) {
-				System.out.println("Invalid army size.");
+				System.out.println("Invalid " + inputName + ".");
 			} else {
 				input = Integer.parseInt(inputString);
 			}
@@ -79,6 +89,8 @@ public class ArmyWars {
 		
 		return input;
 	}
+	
+	//------------------ army generation ---------------------
 	
 	private static Army createArmy(int armyNum, int size, BufferedReader br) throws IOException {
 		System.out.println("Now follows settings for Army " + armyNum + ".");
@@ -96,10 +108,10 @@ public class ArmyWars {
 		
 		switch(generatorType) {
 		case 1:
-			System.out.println("Not implemented");
+			eachUnitSettingsCreation(army, size, br);
 			break;
 		case 2:
-			unitTypeCreation(army, size, br);
+			unitTypeCountCreation(army, size, br);
 			break;
 		case 3:
 			defaultCreation(army, size);
@@ -108,6 +120,46 @@ public class ArmyWars {
 		return army;
 	}
 	
+	private static void eachUnitSettingsCreation(Army army, int size, BufferedReader br) throws IOException {
+		int archerCount = 0;
+		System.out.println("Possible types and it's codes:");
+		System.out.println("(1) Archer");
+		System.out.println("(2) Cavalryman");
+		System.out.println("(3) Swordsman");
+		System.out.println("(4) Spearman");
+		System.out.println("There must be at least one melee unit.");
+		for (int i = 0; i < size; i++) {
+			System.out.print("Unit " + (i+1) + ": ");
+			int typeCode;
+			if (archerCount == size-1) {
+				typeCode = getInput("unit type", 2, 4, br);
+			} else {
+				typeCode = getInput("unit type", 1, 4, br);
+			}
+			
+			if (typeCode == 1) {
+				int accuracy = getInput("accuracy", RangedUnit.MIN_ACCURACY, RangedUnit.MAX_ACCURACY, br);
+				army.addUnit(new Archer(accuracy));
+				archerCount++;
+			} else {
+				int strength = getInput("strength", MeleeUnit.MIN_STRENGTH, MeleeUnit.MAX_STRENGTH, br);
+				Unit newUnit = null;
+				switch (typeCode) {
+				case 2: 
+					newUnit = new Cavalryman(strength); 
+					break;
+				case 3:
+					newUnit = new Swordsman(strength); 
+					break;
+				case 4: 
+					newUnit = new Spearman(strength); 
+					break;
+				}
+				army.addUnit(newUnit);
+			}
+		}
+	}
+
 	private static void defaultCreation(Army army, int size) {
 		int archerCount = (int) Math.ceil(size/4);
 		int meleeCount = (int) Math.floor(size/4);
@@ -117,7 +169,7 @@ public class ArmyWars {
 		addUnits("Spearman", army, meleeCount);
 	}
 	
-	private static void unitTypeCreation(Army army, int size, BufferedReader br) throws IOException {
+	private static void unitTypeCountCreation(Army army, int size, BufferedReader br) throws IOException {
 		System.out.println("Enter count for every unit type (Archer, Cavalryman, Swordsman, Spearman)."+
 				"There must be at least one melee unit.");
 		int armysize = size;
@@ -161,5 +213,25 @@ public class ArmyWars {
 				army.addUnit(new Spearman(randomInRange(MeleeUnit.MIN_STRENGTH, MeleeUnit.MAX_STRENGTH)));
 			}
 		}
+	}
+	
+	// ------------------ choosing  terrain ----------------
+	
+	private static Terrain chooseTerrain(BufferedReader br) throws IOException {
+		List<Terrain> possibleTerrains = new ArrayList<>();
+		possibleTerrains.add(new NormalTerrain());
+		possibleTerrains.add(new MountainTerrain());
+		possibleTerrains.add(new PlainsTerrain());
+		possibleTerrains.add(new WoodTerrain());
+		
+		System.out.println("Please choose terrain.");
+		
+		for (int i = 0, end = possibleTerrains.size(); i < end; i++) {
+			System.out.println("(" + (i+1) + ") " + possibleTerrains.get(i));
+		}
+		
+		int terrainNum = getInput("terrain", 1, possibleTerrains.size(), br);
+		
+		return possibleTerrains.get(terrainNum - 1);
 	}
 }
