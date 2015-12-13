@@ -20,12 +20,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Simple medieval battle simulator.
+ * 
+ * @author Josip Tomić
+ */
 public class ArmyWars {
 
+	/** Maximum army size */
 	public static final int MAX_ARMY_SIZE = 50;
 	
+	/**
+	 * Main method. 
+	 * 
+	 * @param args arguments of the command line, not used
+	 * @throws IOException if error occurs while reading from input stream
+	 */
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		System.out.print("Welcome to Army Wars, a simple medieval battle simulator.");
+		br.readLine();
+		System.out.print("You will choose two armies, their generals, structure and terrain on which they fight.");
+		br.readLine();
+		System.out.print("Each general has strength, and army whose general is stronger has advantage.");
+		br.readLine();
+		System.out.print("Army structure can be defined in 3 different ways. More details on that will be in army generation.");
+		br.readLine();
+		System.out.println("Some units have advantage over other units.");
+		System.out.print("Cavalryman beat Swordsman, Swordsman beat Spearman and Spearman beat Cavalryman.");
+		br.readLine();
+		System.out.print("Terrain affects specific units and gives them advantage or disadvantage.");
+		br.readLine();
+		System.out.println();
 		
 		int size = getInput("army size", 1, MAX_ARMY_SIZE, br);
 		
@@ -58,6 +85,14 @@ public class ArmyWars {
 	
 	//------------------ side methods ---------------------
 	
+	/**
+	 * Checks if input string is a number between given values
+	 * 
+	 * @param intString input string
+	 * @param minNum minimum integer value (inclusive)
+	 * @param maxNum maximum integer value (inclusive)
+	 * @return true if input string is valid integer string between given max and min values
+	 */
 	private static boolean checkIfValid(String intString, int minNum, int maxNum) {
 		int num;
 		try {
@@ -68,11 +103,29 @@ public class ArmyWars {
 		return num >= minNum && num <= maxNum;
 	}
 	
+	/**
+	 * Returns random number in given range.
+	 * 
+	 * @param min minimum random value (inclusive)
+	 * @param max maximum random value (inclusive)
+	 * @return random number in given range
+	 */
 	public static int randomInRange(int min, int max) {
 		Random ran = new Random();
 		return ran.nextInt(max-min+1) + min;
 	}
 	
+	/**
+	 * Gets input from given {@link BufferedReader}. Input must be integer between given minimum and maximum value.
+	 * Repeats prompt for input until valid input is given.
+	 * 
+	 * @param inputName name of the input, serves for printing messages to user
+	 * @param min minimum input value 
+	 * @param max maximum input value
+	 * @param br {@link BufferedReader} for reading purposes
+	 * @return read input
+	 * @throws IOException if error occurs while reading
+	 */
 	private static int getInput(String inputName, int min, int max, BufferedReader br) throws IOException {
 		boolean validInput;
 		int input = min;
@@ -92,6 +145,15 @@ public class ArmyWars {
 	
 	//------------------ army generation ---------------------
 	
+	/**
+	 * Creates and returns army of given size.
+	 * 
+	 * @param armyNum army identification number, used for printing to user
+	 * @param size size of the army
+	 * @param br {@link BufferedReader} for reading user input
+	 * @return created army of given size
+	 * @throws IOException if error occurs while reading user input
+	 */
 	private static Army createArmy(int armyNum, int size, BufferedReader br) throws IOException {
 		System.out.println("Now follows settings for Army " + armyNum + ".");
 		
@@ -120,6 +182,15 @@ public class ArmyWars {
 		return army;
 	}
 	
+	/**
+	 * Fills given army with custom made units provided from user input. For every 
+	 * unit user will be prompted to enter type of unit and unit specific trait (strength/accuracy)
+	 * 
+	 * @param army army to be filled
+	 * @param size size of the army
+	 * @param br {@link BufferedReader} for reading user input
+	 * @throws IOException if error occurs while reading 
+	 */
 	private static void eachUnitSettingsCreation(Army army, int size, BufferedReader br) throws IOException {
 		int archerCount = 0;
 		System.out.println("Possible types and it's codes:");
@@ -160,6 +231,14 @@ public class ArmyWars {
 		}
 	}
 
+	/**
+	 * Fills army with default structure. Size will be divided in 4, so every unit type will 
+	 * have same amount. If size is not divisible by 4, remaining units will be {@link Archer} type.
+	 * All units will have random number for their specific trait.
+	 * 
+	 * @param army army to be filled
+	 * @param size size of the army
+	 */
 	private static void defaultCreation(Army army, int size) {
 		int archerCount = (int) Math.ceil(size/4);
 		int meleeCount = (int) Math.floor(size/4);
@@ -169,6 +248,15 @@ public class ArmyWars {
 		addUnits("Spearman", army, meleeCount);
 	}
 	
+	/**
+	 * Fills army with custom amount of every unit type. User will be prompted to enter number of 
+	 * units for every type. All units will have random number for their specific trait.
+	 * 
+	 * @param army army to be filled
+	 * @param size size of the army
+	 * @param br {@link BufferedReader} for user input
+	 * @throws IOException if error occurs while reading
+	 */
 	private static void unitTypeCountCreation(Army army, int size, BufferedReader br) throws IOException {
 		System.out.println("Enter count for every unit type (Archer, Cavalryman, Swordsman, Spearman)."+
 				"There must be at least one melee unit.");
@@ -191,6 +279,14 @@ public class ArmyWars {
 		addUnits("Spearman", army, armysize);
 	}
 	
+	/**
+	 * Adds given number of units to given army. All added units will
+	 * have radnom number for their specific trait. 
+	 * 
+	 * @param unitName name of unit type
+	 * @param army army where units will be added
+	 * @param count number of units to be added
+	 */
 	private static void addUnits(String unitName, Army army, int count) {
 		switch(unitName) {
 		case "Archer" :
@@ -217,6 +313,13 @@ public class ArmyWars {
 	
 	// ------------------ choosing  terrain ----------------
 	
+	/**
+	 * Prompts user for terrain to be used in battle.
+	 * 
+	 * @param br {@link BufferedReader} for reading user input
+	 * @return terrain which user chose
+	 * @throws IOException if error occurs while reading
+	 */
 	private static Terrain chooseTerrain(BufferedReader br) throws IOException {
 		List<Terrain> possibleTerrains = new ArrayList<>();
 		possibleTerrains.add(new NormalTerrain());
